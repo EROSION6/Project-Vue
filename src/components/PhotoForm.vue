@@ -13,31 +13,36 @@
 <script>
 export default {
 	name: 'PhotoForm',
-
 	data() {
 		return {
 			title: '',
 			url: '',
 		}
 	},
-
 	methods: {
 		onFileChange(event) {
 			const file = event.target.files[0]
 			this.url = file
 		},
 		addPhoto() {
-			const reader = new FileReader()
+			if (this.title === '' && this.url === null) {
+				alert('Заголовок и изображение обязательны к заполнению.')
+				return
+			} else {
+				const reader = new FileReader()
 
-			reader.onload = () => {
-				const photo = {
-					id: Date.now(),
-					title: this.title,
-					url: reader.result,
+				reader.onload = () => {
+					const photo = {
+						id: Date.now(),
+						title: this.title,
+						url: reader.result,
+					}
+					this.$store.commit('addPhoto', photo)
 				}
-				this.$emit('addPhoto', photo)
+				reader.readAsDataURL(this.url)
+				this.title = ''
+				this.url = ''
 			}
-			reader.readAsDataURL(this.url)
 		},
 	},
 }

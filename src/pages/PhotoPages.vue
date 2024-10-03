@@ -1,21 +1,16 @@
 <template>
-	<div class="photos" v-if="!isLoading">
-		<PhotoForm @addPhoto="addPhoto" :openDialog="openDialog" />
+	<div class="photos" v-if="!$store.state.isLoading">
+		<PhotoForm />
 		<div class="container">
 			<Photo
-				v-for="photo in photos"
+				v-for="photo in $store.getters.getPhotos"
 				:key="photo.id"
 				:photo="photo"
-				@openDialog="openDialog($event)"
 			/>
 		</div>
-		<PhotoDialog
-			:photo="selectedPhoto"
-			:isVisibleDialog="isVisibleDialog"
-			@closeDialog="closeDialog"
-		/>
+		<PhotoDialog />
 	</div>
-	<div class="loading" v-else>Loading...</div>
+	<div v-else>Loading...</div>
 </template>
 
 <script>
@@ -25,38 +20,8 @@ import PhotoForm from '@/components/PhotoForm.vue'
 
 export default {
 	components: { Photo, PhotoForm, PhotoDialog },
-	data() {
-		return {
-			photos: [],
-			isLoading: true,
-			isVisibleDialog: false,
-			selectedPhoto: {},
-		}
-	},
 	mounted() {
-		this.fetchPhotos()
-	},
-	methods: {
-		async fetchPhotos() {
-			const response = await fetch(
-				'https://jsonplaceholder.typicode.com/photos?_limit=10'
-			)
-			this.isLoading = false
-			const data = await response.json()
-			this.photos = data
-		},
-
-		addPhoto(photo) {
-			this.photos.push(photo)
-		},
-
-		openDialog(photo) {
-			this.isVisibleDialog = true
-			this.selectedPhoto = photo
-		},
-		closeDialog() {
-			this.isVisibleDialog = false
-		},
+		this.$store.dispatch('fetchPhotos')
 	},
 }
 </script>
